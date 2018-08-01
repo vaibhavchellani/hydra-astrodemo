@@ -5,14 +5,13 @@ from hydrus.hydraspec import doc_maker
 app = Flask(__name__)
 app.secret_key = "any random string"
 
+history = []
 @app.route('/')
 def index():
     return render_template("index.html")
     
 @app.route('/', methods= ['GET','POST'])
 def enter_url():
-    global history
-    history = []
     if request.method == 'GET':
         return render_template("index.html")
     if request.method == 'POST':
@@ -40,6 +39,7 @@ def enter_url():
 
 @app.route('/query',methods=['GET','POST'])
 def enter_query():
+    global history
     if request.method == 'GET':
         return render_template("index.html")
     if request.method == 'POST':
@@ -53,6 +53,7 @@ def enter_query():
             print(history_rev)
             if len(history_rev)>5:
                 history_rev.pop()
+                history = history_rev[::-1]
             output = facades.user_query(query)
         return render_template("index.html", query_output = output, history = history_rev)
 
