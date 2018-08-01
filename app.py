@@ -11,11 +11,14 @@ def index():
     
 @app.route('/', methods= ['GET','POST'])
 def enter_url():
+    global history
+    history = []
     if request.method == 'GET':
         return render_template("index.html")
     if request.method == 'POST':
         if 'url' in request.form:
             url= request.form['url']
+            history.append(url)
             session['url'] = url
             handle_data = querying_mechanism.HandleData()
             global api_doc
@@ -45,8 +48,13 @@ def enter_query():
             print(session['url'])
             query = request.form['query']
             print(query)
+            history.append(query)
+            history_rev = history[::-1]
+            print(history_rev)
+            if len(history_rev)>5:
+                history_rev.pop()
             output = facades.user_query(query)
-        return render_template("index.html", query_output = output)
+        return render_template("index.html", query_output = output, history = history_rev)
 
 if __name__ == "__main__":
     app.run()
